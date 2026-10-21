@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Task Manager | Usability Lab</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#19283b;background:#f1f5fa}*{box-sizing:border-box}body{margin:0}header{background:#17365b;color:white;padding:42px 20px;text-align:center}header h1{margin:0 0 8px}main{max-width:750px;margin:auto;padding:24px 16px}.panel{background:white;border-radius:14px;padding:24px;margin:20px 0;box-shadow:0 3px 18px #1a36531a}form{display:flex;gap:10px;flex-wrap:wrap}input[type=text]{flex:1;min-width:180px;padding:13px;border:1px solid #9aadc0;border-radius:8px;font:inherit}button{padding:12px 17px;border:0;border-radius:8px;background:#1766b1;color:white;font:inherit;cursor:pointer}button:hover{background:#0d4d88}.secondary{background:#526a80}.danger{background:#a42d42}.danger:hover{background:#832034}.fake{display:inline-block;background:#1766b1;color:white;padding:12px 17px;border-radius:8px;cursor:pointer;user-select:none}#error{color:#b42336;font-weight:600;min-height:24px}ul{list-style:none;padding:0}li{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #e2e7ee}li span{flex:1;overflow-wrap:anywhere}li.done span{text-decoration:line-through;color:#65758a}li input{width:20px;height:20px}li button{padding:8px 12px}.help{line-height:1.7}.help details{border-bottom:1px solid #e0e5ed;padding:14px 0}.help summary{cursor:pointer;font-weight:650}footer{text-align:center;padding:30px;color:#64748b}@media(max-width:450px){form button{width:100%}.panel{padding:18px}}
+</style>
+<!-- CLARITY TRACKING CODE HERE -->
+</head>
+<body>
+<header><h1>My Task Manager</h1><p>Organize your day, one task at a time.</p></header>
+<main>
+<section class="panel"><h2>Add a task</h2><form id="taskForm"><input id="taskInput" type="text" maxlength="120" placeholder="e.g. Finish homework" aria-label="New task"><button type="submit">Add Task</button></form><p id="error" role="alert"></p><p id="status" aria-live="polite">0 tasks remaining</p></section>
+<section class="panel"><h2>Your tasks</h2><ul id="tasks"></ul><p id="empty">No tasks yet. Add one above!</p><button class="secondary" id="clearCompleted" type="button">Clear Completed</button></section>
+<section class="panel"><h2>Productivity tips</h2><p>Need ideas for getting organized? Explore some quick task management tips.</p><span class="fake">View Task Tips →</span><p><small>Try creating three tasks, completing one, and clearing completed tasks.</small></p></section>
+<section class="panel help"><h2>Help & Frequently Asked Questions</h2><p>Use this guide to get started and learn how the task manager works. Scroll down to explore each question.</p><details><summary>How do I add a task?</summary><p>Enter a task in the text field and press Add Task. Blank tasks show an error.</p></details><details><summary>How do I mark a task complete?</summary><p>Click the checkbox beside a task. Click again to mark it incomplete.</p></details><details><summary>How do I delete a task?</summary><p>Click the Delete button next to the task you want to remove.</p></details><details><summary>How do I clear completed tasks?</summary><p>Press Clear Completed to remove every checked task.</p></details><details><summary>Will my tasks be saved?</summary><p>Yes. Tasks are saved in your browser's local storage on this device.</p></details><details><summary>What if I submit an empty task?</summary><p>An error message appears asking you to enter a task.</p></details><details><summary>Can I use this on my phone?</summary><p>Yes. The layout adjusts to smaller screens.</p></details><details><summary>How can I stay productive?</summary><p>Start with one important task, split large projects into smaller steps, and check off tasks as you finish them.</p></details></section>
+</main><footer>Task Manager • Usability Testing Lab</footer>
+<script>
+const KEY='clarity-lab-tasks';let tasks=[];try{tasks=JSON.parse(localStorage.getItem(KEY))||[];if(!Array.isArray(tasks))tasks=[]}catch(e){tasks=[]}
+const input=document.getElementById('taskInput'),error=document.getElementById('error'),list=document.getElementById('tasks');
+function save(){localStorage.setItem(KEY,JSON.stringify(tasks))}
+function render(){list.replaceChildren();tasks.forEach(task=>{const li=document.createElement('li');if(task.done)li.className='done';const check=document.createElement('input');check.type='checkbox';check.checked=task.done;check.setAttribute('aria-label','Complete '+task.text);check.addEventListener('change',()=>{task.done=check.checked;save();render()});const label=document.createElement('span');label.textContent=task.text;const del=document.createElement('button');del.type='button';del.className='danger';del.textContent='Delete';del.addEventListener('click',()=>{tasks=tasks.filter(t=>t.id!==task.id);save();render()});li.append(check,label,del);list.append(li)});document.getElementById('empty').hidden=tasks.length>0;document.getElementById('status').textContent=tasks.filter(t=>!t.done).length+' tasks remaining'}
+document.getElementById('taskForm').addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value){error.textContent='Please enter a task before clicking Add Task.';return}error.textContent='';tasks.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),text:value,done:false});input.value='';save();render()});
+document.getElementById('clearCompleted').addEventListener('click',()=>{tasks=tasks.filter(t=>!t.done);save();render()});render();
+</script>
+</body></html>
